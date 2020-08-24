@@ -12,6 +12,7 @@ func TestAttribute_String(t *testing.T) {
 		in   Attribute
 		want string
 	}{
+		{in: None, want: "none"},
 		{in: Fire, want: "fire"},
 		{in: Ice, want: "ice"},
 		{in: Earth, want: "wind"},
@@ -32,6 +33,7 @@ func TestAttribute_MarshalJSON(t *testing.T) {
 		in   Attribute
 		want []byte
 	}{
+		{in: None, want: []byte(`"none"`)},
 		{in: Fire, want: []byte(`"fire"`)},
 		{in: Ice, want: []byte(`"ice"`)},
 		{in: Earth, want: []byte(`"wind"`)},
@@ -55,6 +57,7 @@ func TestAttribute_UnmarshalJSON(t *testing.T) {
 		in   []byte
 		want Attribute
 	}{
+		{in: []byte(`"none"`), want: None},
 		{in: []byte(`"fire"`), want: Fire},
 		{in: []byte(`"ice"`), want: Ice},
 		{in: []byte(`"wind"`), want: Earth},

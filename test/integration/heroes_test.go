@@ -43,3 +43,12 @@ func TestHeroes_GetByID(t *testing.T) {
 		}
 	}
 }
+
+func TestHeroes_List(t *testing.T) {
+	client := e7.NewClient()
+
+	_, _, err := client.Heroes.List(context.Background())
+	if err != nil {
+		t.Fatalf("Repositories.List returned error: %v", err)
+	}
+}

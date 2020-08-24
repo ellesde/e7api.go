@@ -11,6 +11,7 @@ type Attribute int
 
 // Hero attribute.
 const (
+	None           = -1
 	Fire Attribute = iota
 	Ice
 	Earth
@@ -19,6 +20,7 @@ const (
 )
 
 var attributeStrings = map[Attribute]string{
+	None:  "none",
 	Fire:  "fire",
 	Ice:   "ice",
 	Earth: "wind",
@@ -27,6 +29,7 @@ var attributeStrings = map[Attribute]string{
 }
 
 var attributes = map[string]Attribute{
+	"none":  None,
 	"fire":  Fire,
 	"ice":   Ice,
 	"wind":  Earth,

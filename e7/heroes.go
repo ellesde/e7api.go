@@ -12,30 +12,33 @@ type HeroesService service
 
 // Hero represents an Epic Seven hero profile.
 type Hero struct {
-	UUID                string                                `json:"_id,omitempty"`
-	ID                  string                                `json:"id,omitempty"`
-	Name                string                                `json:"name,omitempty"`
-	Moonlight           bool                                  `json:"moonlight,omitempty"`
-	Rarity              uint                                  `json:"rarity,omitempty"`
-	Attribute           Attribute                             `json:"attribute,omitempty"`
-	Role                Role                                  `json:"role,omitempty"`
-	Zodiac              string                                `json:"zodiac,omitempty"`
-	Description         string                                `json:"description,omitempty"`
-	Story               string                                `json:"story,omitempty"`
-	GetLine             string                                `json:"get_line,omitempty"`
-	Stats               BaseStats                             `json:"stats,omitempty"`
-	Relationships       []Relationship                        `json:"relationships,omitempty"`
-	SelfDevotion        SelfDevotion                          `json:"self_devotion,omitempty"`
-	Devotion            Devotion                              `json:"devotion,omitempty"`
-	Specialty           Specialty                             `json:"specialty,omitempty"`
-	Camping             Camping                               `json:"camping,omitempty"`
-	ZodiacTree          []ZodiacNode                          `json:"zodiac_tree,omitempty"`
-	Skills              []Skill                               `json:"skills,omitempty"`
-	SpecialtyChange     SpecialtyChange                       `json:"specialty_change,omitempty"`
-	Assets              Assets                                `json:"assets,omitempty"`
-	Buffs               []Buff                                `json:"buffs,omitempty"`
-	Debuffs             []Debuff                              `json:"debuffs,omitempty"`
-	Common              []Common                              `json:"common,omitempty"`
+	UUID            string          `json:"_id,omitempty"`
+	ID              string          `json:"id,omitempty"`
+	Name            string          `json:"name,omitempty"`
+	Moonlight       bool            `json:"moonlight,omitempty"`
+	Rarity          uint            `json:"rarity,omitempty"`
+	Attribute       Attribute       `json:"attribute,omitempty"`
+	Role            Role            `json:"role,omitempty"`
+	Zodiac          string          `json:"zodiac,omitempty"`
+	Description     string          `json:"description,omitempty"`
+	Story           string          `json:"story,omitempty"`
+	GetLine         string          `json:"get_line,omitempty"`
+	Stats           BaseStats       `json:"stats,omitempty"`
+	Relationships   []Relationship  `json:"relationships,omitempty"`
+	SelfDevotion    SelfDevotion    `json:"self_devotion,omitempty"`
+	Devotion        Devotion        `json:"devotion,omitempty"`
+	Specialty       Specialty       `json:"specialty,omitempty"`
+	Camping         Camping         `json:"camping,omitempty"`
+	ZodiacTree      []ZodiacNode    `json:"zodiac_tree,omitempty"`
+	Skills          []Skill         `json:"skills,omitempty"`
+	SpecialtyChange SpecialtyChange `json:"specialty_change,omitempty"`
+	Assets          Assets          `json:"assets,omitempty"`
+
+	// TODO: See issue #3.
+	Buffs   []interface{} `json:"buffs,omitempty"`
+	Debuffs []interface{} `json:"debuffs,omitempty"`
+	Common  []interface{} `json:"common,omitempty"`
+
 	ExclusiveEquipments []ExclusiveEquipment                  `json:"exclusiveEquipments,omitempty"`
 	CalculatedStats     map[PreCalculatedState]CalculatedStat `json:"calculatedStatus,omitempty"`
 }
@@ -371,7 +374,7 @@ type CalculatedStat struct {
 // HeroesResponse is an EpicSevenDB API response that contains a list
 // of heroes.
 type HeroesResponse struct {
-	Results  []*Hero  `json:"results,omitempty"`
+	Results  []Hero   `json:"results,omitempty"`
 	Metadata Metadata `json:"metadata,omitempty"`
 }
 
@@ -390,5 +393,22 @@ func (s *HeroesService) GetByID(ctx context.Context, hero string) (*Hero, *http.
 		return nil, resp, err
 	}
 
-	return response.Results[0], resp, nil
+	return &response.Results[0], resp, nil
+}
+
+// List fetches all heroes.
+func (s *HeroesService) List(ctx context.Context) ([]Hero, *http.Response, error) {
+	u := fmt.Sprintf("hero")
+	req, err := s.client.NewRequest(http.MethodGet, u)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	response := new(HeroesResponse)
+	resp, err := s.client.Do(ctx, req, response)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return response.Results, resp, nil
 }
