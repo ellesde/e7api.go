@@ -1,0 +1,48 @@
+name: Test
+on:
+  push:
+    branches: [master]
+  pull_request:
+    paths:
+      - "**.go"
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.13.x, 1.14.x, 1.15.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Setup Go environment
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache Go modules
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Run gofmt
+        if: runner.os != 'Windows'
+        run: diff -u <(echo -n) <(gofmt -d -s .)
+
+      - name: Ensure go generate produces a zero diff
+        shell: bash
+        run: go generate -x ./... && git diff --exit-code; code=$?; git checkout -- .; (exit $code)
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run go test
+        run: go test -v -race -coverprofile coverage.txt -covermode atomic ./...
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
